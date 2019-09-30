@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cw.dao.AnaMapper">
+
+    <!-- 封装返回结果resultMap -->
+    <resultMap id="anaResultMap" type="com.alibaba.fastjson.JSONObject">
+        <id property="id" column="id"/>
+        <id property="userId" column="user_id"/>
+        <id property="anaTypeId" column="ana_type_id"/>
+        <id property="anaTitle" column="ana_title"/>
+        <id property="anaContent" column="ana_content"/>
+        <id property="anaFrom" column="ana_from"/>
+        <id property="commentNum" column="comment_num"/>
+        <id property="prizeNum" column="prize_num"/>
+        <id property="createDate" column="create_date"/>
+    </resultMap>
+
+    <!-- 添加语录 -->
+    <insert id="anaPublic">
+        INSERT INTO `ana` (`user_id`,`ana_type_id`,`ana_title`,`ana_content`,`create_date`) VALUES (#{userId},#{anaTypeId},#{anaTitle},#{anaContent},now());
+    </insert>
+
+    <!-- 根据语录ID 获取语录详情信息  -->
+    <select id="getAnaInfo" resultMap="anaResultMap">
+        SELECT
+            a.*,
+            (SELECT user_nick_name FROM `user` WHERE id = a.user_id) AS ana_from,
+            (SELECT COUNT(0) FROM `prize` p WHERE a.id = p.ana_id AND p.user_id = #{userId}) AS isPrize,
+            (SELECT COUNT(0) FROM `collect` c WHERE a.id = c.ana_id AND c.user_id = #{userId}) AS isCollect
+        FROM `ana` a WHERE a.id = #{anaId}
+    </select>
+
+    <!-- 根据分类ID、搜索 获取语录 -->
+    <select id="getAnaList" resultMap="anaResultMap">
+        SELECT
+            a.*,
+            (SELECT user_nick_name FROM `user` WHERE id = a.user_id) AS ana_from,
+            (SELECT COUNT(0) FROM `prize` p WHERE a.id = p.ana_id AND p.user_id = #{userId}) AS isPrize,
+            (SELECT COUNT(0) FROM `collect` c WHERE a.id = c.ana_id AND c.user_id = #{userId}) AS isCollect
+        FROM `ana` a
+        <where>
+          <if test="anaTypeId != 0 and anaTypeId != '' and anaTypeId != null">
+              a.ana_type_id = #{anaTypeId}
+          </if>
+          <if test="searchName != '' and searchName != null">
+              and (a.ana_title LIKE CONCAT('%',#{searchName},'%') OR a.ana_content LIKE CONCAT('%',#{searchName},'%') OR a.ana_from LIKE CONCAT('%',#{searchName},'%') )
+          </if>
+        </where>
+        ORDER BY a.`create_date` DESC
+    </select>
+
+    <!-- 因为我们取的是倒叙，所以这里上一条下一条也要反一下 -->
+
+    <!-- 根据语录ID 获取上条语录 -->
+    <select id="getAnaUp" resultMap="anaResultMap">
+        SELECT
+            a.*,
+            (SELECT user_nick_name FROM `user` WHERE id = a.user_id) AS ana_from,
+            (SELECT COUNT(0) FROM `prize` p WHERE a.id = p.ana_id AND p.user_id = #{userId}) AS isPrize,
+            (SELECT COUNT(0) FROM `collect` c WHERE a.id = c.ana_id AND c.user_id = #{userId}) AS isCollect
+        FROM `ana` a
+        <where>
+            id <![CDATA[ > ]]> #{anaId}
+            <if test="anaTypeId != 0 and anaTypeId != '' and anaTypeId != null">
+                AND a.ana_type_id = #{anaTypeId}
+            </if>
+        </where>
+        ORDER BY a.create_date ASC LIMIT 0,1
+    </select>
+
+    <!-- 根据语录ID 获取下条语录 -->
+    <select id="getAnaDown" resultMap="anaResultMap">
+        SELECT
+            a.*,
+            (SELECT user_nick_name FROM `user` WHERE id = a.user_id) AS ana_from,
+            (SELECT COUNT(0) FROM `prize` p WHERE a.id = p.ana_id AND p.user_id = #{userId}) AS isPrize,
+            (SELECT COUNT(0) FROM `collect` c WHERE a.id = c.ana_id AND c.user_id = #{userId}) AS isCollect
+        FROM `ana` a
+        <where>
+            id <![CDATA[ < ]]> #{anaId}
+            <if test="anaTypeId != 0 and anaTypeId != '' and anaTypeId != null">
+                AND a.ana_type_id = #{anaTypeId}
+            </if>
+        </where>
+        ORDER BY a.create_date DESC LIMIT 0,1
+    </select>
+
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cw.dao.CommentMapper">
+
+    <!-- 封装返回结果resultMap -->
+    <resultMap id="commentResultMap" type="com.alibaba.fastjson.JSONObject">
+        <id property="id" column="id"/>
+        <id property="userId" column="user_id"/>
+        <id property="anaId" column="ana_id"/>
+        <id property="anaTitle" column="ana_title"/>
+        <id property="commentContent" column="comment_content"/>
+        <id property="createDate" column="create_date"/>
+    </resultMap>
+
+    <!-- 用户评论 -->
+    <insert id="anaComment">
+        INSERT INTO `comment`(`user_id`,`ana_id`,`comment_content`,`create_date`) VALUES (#{userId},#{anaId},#{commentContent},NOW());
+    </insert>
+
+    <!-- 更新语录评论 -->
+    <insert id="anaCommentUpdate">
+        UPDATE ana SET comment_num = comment_num + 1 WHERE id = #{anaId}
+    </insert>
+
+    <!-- 获取语录的评论 -->
+    <select id="getCommentList" resultMap="commentResultMap">
+        SELECT c.*,u.user_nick_name as userNickName,u.user_head_img as userHeadImg
+        FROM `comment` c
+        INNER JOIN `user` u ON c.user_id = u.id
+        WHERE `ana_id` = #{anaId}
+        ORDER BY c.`create_date` DESC,c.`id` DESC
+    </select>
+
+</mapper>

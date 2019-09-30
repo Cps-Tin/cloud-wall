@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cw.dao.AnaTypeMapper">
+
+    <!-- 封装返回结果resultMap -->
+    <resultMap id="anaTypeResultMap" type="com.alibaba.fastjson.JSONObject">
+        <id property="id" column="id"/>
+        <id property="anaTypeName" column="ana_type_name"/>
+        <id property="createDate" column="create_date"/>
+    </resultMap>
+
+    <!-- 获取所有分类 -->
+    <select id="getAnaTypeList" resultMap="anaTypeResultMap">
+        SELECT * FROM `ana_type`
+    </select>
+
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.cw.dao.PrizeMapper">
+
+    <!-- 用户点赞 -->
+    <insert id="anaPrize">
+        INSERT INTO `cloud_wall`.`prize` (`user_id`,`ana_id`,`create_date`) VALUES(#{userId},#{anaId},NOW());
+    </insert>
+
+    <!-- 更新语录点赞数量 -->
+    <update id="anaPrizeUpdate">
+        UPDATE `ana` SET prize_num = prize_num + 1 WHERE id = #{anaId};
+    </update>
+
+    <!-- 用户登陆同步本地点赞记录 -->
+    <insert id="userLoginSyncPrizeList">
+        INSERT INTO `cloud_wall`.`prize` (`user_id`,`ana_id`,`create_date`) VALUES
+        <foreach collection="prizeList" item="anaId" separator=",">
+            (#{userId},#{anaId},NOW())
+        </foreach>
+    </insert>
+
+
+</mapper>
