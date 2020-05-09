@@ -1,6 +1,5 @@
 package cn.cw.dao;
 
-import cn.cw.entity.User;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.ibatis.annotations.Param;
 
