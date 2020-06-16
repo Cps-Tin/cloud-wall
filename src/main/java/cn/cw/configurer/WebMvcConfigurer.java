@@ -19,11 +19,13 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.alibaba.fastjson.support.config.FastJsonConfig;
 import com.alibaba.fastjson.support.spring.FastJsonHttpMessageConverter;
 
+import io.swagger.annotations.ApiOperation;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.format.FormatterRegistry;
@@ -34,11 +36,19 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.config.annotation.*;
+import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
  * Spring MVC 配置
  */
 @Configuration
+@EnableSwagger2
 public class WebMvcConfigurer extends WebMvcConfigurationSupport  {
 
     private final Logger logger = LoggerFactory.getLogger(WebMvcConfigurer.class);
@@ -69,6 +79,45 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport  {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //映射访问资源根目录下的static文件夹，访问文件就不用添加前缀了，upLoadPath 访问上传文件路径
         registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/",upLoadPath);
+        //过滤swagger路径
+        registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("doc.html").addResourceLocations("classpath:/META-INF/resources/");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
+
+    /**
+     * swagger2的配置文件，这里可以配置swagger2的一些基本的内容，比如扫描的包等等
+     * @return Docket
+     */
+    @Bean
+    public Docket createRestApi() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                //此包路径下的类，才生成接口文档
+                .apis(RequestHandlerSelectors.basePackage("cn.cw.web"))
+                //加了ApiOperation注解的类，才生成接口文档
+                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+                .paths(PathSelectors.any())
+                .build();
+//				.globalOperationParameters(setHeaderToken());
+    }
+
+    /**
+     * swagger
+     * api文档的详细信息函数,注意这里的注解引用的是哪个
+     * @return
+     */
+    private ApiInfo apiInfo() {
+        return new ApiInfoBuilder()
+                // //大标题
+                .title("网易热评墙 接口API接口文档")
+                // 版本号
+                .version("1.0")
+//				.termsOfServiceUrl("NO terms of service")
+                // 描述
+                .description("restful 风格接口")
+                .build();
     }
 
     //使用阿里 FastJson 作为JSON MessageConverter
@@ -238,5 +287,7 @@ public class WebMvcConfigurer extends WebMvcConfigurationSupport  {
 
         return ip;
     }
+
+
 
 }

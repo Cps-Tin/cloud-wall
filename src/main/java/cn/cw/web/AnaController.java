@@ -9,6 +9,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +22,8 @@ import java.util.List;
  * User: _Cps
  * Date: 2019.08.02 13:12
  */
-@Controller
-@ResponseBody
+@RestController
+@Api(tags="语录接口")
 @RequestMapping("/ana")
 public class AnaController {
 
@@ -72,10 +74,11 @@ public class AnaController {
     }
 
     /**
-     * 根据分类ID、搜索获取语录
+     * 根据分类ID获取语录
      * 参数:anaTypeId searchName current pageSize
      */
     @PostMapping("/getAnaList")
+    @ApiOperation(value = "根据分类ID 获取语录")
     Result getAnaList(@RequestBody JSONObject object){
         Integer current = object.getInteger("current");
         Integer pageSize = object.getInteger("pageSize");

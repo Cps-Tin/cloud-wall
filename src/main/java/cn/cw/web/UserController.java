@@ -12,6 +12,10 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import jdk.nashorn.internal.scripts.JO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +32,8 @@ import java.util.Map;
  * @author _Cps
  * @create 2019-02-14 10:24
  */
-@Controller
-@ResponseBody
+@RestController
+@Api(tags="用户接口")
 @RequestMapping("/user")
 public class UserController{
 
@@ -97,6 +101,7 @@ public class UserController{
      * 参数 user
      */
     @PostMapping("/userLogin")
+    @ApiOperation(value = "用户登录")
     public Result userLogin(@RequestBody JSONObject user){
         user.put("userPassword", MD5Util.getMD5String(user.getString("userPassword")));
         Result result = null;
