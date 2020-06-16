@@ -33,7 +33,6 @@ import java.util.Map;
  * @create 2019-02-14 10:24
  */
 @RestController
-@Api(tags="用户接口")
 @RequestMapping("/user")
 public class UserController{
 
@@ -101,7 +100,6 @@ public class UserController{
      * 参数 user
      */
     @PostMapping("/userLogin")
-    @ApiOperation(value = "用户登录")
     public Result userLogin(@RequestBody JSONObject user){
         user.put("userPassword", MD5Util.getMD5String(user.getString("userPassword")));
         Result result = null;
