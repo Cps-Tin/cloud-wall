@@ -49,7 +49,7 @@ public class UserController{
     public Result visit(String device, HttpServletRequest request){
         Result result = null;
         String ip = IpUtil.getIpAddr(request);
-        String address = IpUtil.getRealAddressByIP(ip);
+        String address = IpUtil.getRealAddressByIP(request);
         System.err.println(device);
         Integer num = userService.visit(ip,address,device);
         if(num == 1){
