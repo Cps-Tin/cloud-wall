@@ -12,7 +12,7 @@
 
     <!-- 获取所有分类 -->
     <select id="getAnaTypeList" resultMap="anaTypeResultMap">
-        SELECT * FROM `ana_type`
+        SELECT * FROM `ana_type` order by id desc
     </select>
 
 </mapper>
