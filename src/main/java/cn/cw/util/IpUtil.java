@@ -4,9 +4,15 @@ import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import sun.net.www.protocol.http.HttpURLConnection;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 
 /**
@@ -28,23 +34,28 @@ public class IpUtil
      * @param request
      * @return
      */
-    public static String getRealAddressByIP(HttpServletRequest request)
-    {
+    public static String getRealAddressByIP(HttpServletRequest request) {
         String ip =IpUtil.getIpAddr(request);
         String address = "XX XX";
         // 内网不查询
-        if ("".equals(ip) || ip==null)
-        {
+        if ("".equals(ip) || ip==null) {
             return "内网IP";
         }
-        String rspStr = HttpUtil.sendPost(IP_URL, "ip=" + ip);
-        if (rspStr.isEmpty())
-        {
-            log.error("获取地理位置异常 {}", ip);
+        String rspStr = null;
+        try {
+            URL url = new URL(IP_URL+"?ip="+ip+"&accessKey=alibaba-inc");
+            HttpURLConnection urlCon = (HttpURLConnection) url.openConnection();
+            urlCon.connect();
+            InputStream inputStream = urlCon.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            rspStr = bufferedReader.readLine();
+            JSONObject obj = JSONObject.parseObject(rspStr).getJSONObject("data");
+            address = obj.getString("country")+" "+obj.getString("region")+" "+obj.getString("city");
+        } catch (IOException e) {
+            e.printStackTrace();
             return address;
         }
-        JSONObject obj = JSONObject.parseObject(rspStr).getJSONObject("data");
-        return obj.getString("country")+" "+obj.getString("region")+" "+obj.getString("city");
+        return address;
     }
 
     /**
