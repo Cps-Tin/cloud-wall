@@ -4,7 +4,10 @@ import cn.cw.core.Result;
 import cn.cw.core.ResultCode;
 import cn.cw.core.ResultGenerator;
 import cn.cw.core.ResultPages;
+import cn.cw.service.AnaTypeService;
 import cn.cw.service.UserService;
+import cn.cw.service.impl.AnaTypeServiceImpl;
+import cn.cw.service.impl.UserServiceImpl;
 import cn.cw.util.*;
 import cn.cw.util.encrypt.MD5Util;
 import com.alibaba.fastjson.JSON;
@@ -17,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import jdk.nashorn.internal.scripts.JO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,9 +42,24 @@ public class UserController{
 
     @Resource
     public UserService userService;
+    
+    @Resource
+    private AnaTypeService anaTypeService;
+    
+    @Resource
+    private AnaTypeServiceImpl anaTypeServiceImpl;
 
     String upLoadPath = "static"+ File.separator+"upLoadFiles" + File.separator;
-
+    
+    @RequestMapping("/test")
+    public Result test() {
+        List<JSONObject> anaTypeList1 = this.anaTypeService.getAnaTypeList();
+        List<JSONObject> anaTypeList2 = this.anaTypeServiceImpl.getAnaTypeList();
+        System.out.println(JSON.toJSONString(anaTypeList1));
+        System.out.println(JSON.toJSONString(anaTypeList2));
+        return ResultGenerator.genSuccessResult("");
+    }
+    
     /**
      * 访问记录
      * 参数 device 设备信息
